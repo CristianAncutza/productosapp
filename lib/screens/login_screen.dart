@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:productosapp/providers/login_form_provider.dart';
-import 'package:productosapp/screens/screens.dart';
-import 'package:productosapp/ui/input_decoration.dart';
-import 'package:productosapp/widgets/widgets.dart';
+import 'package:productosapp/services/services.dart';
 import 'package:provider/provider.dart';
+
+import 'package:productosapp/ui/input_decorations.dart';
+import 'package:productosapp/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -25,10 +26,17 @@ class LoginScreen extends StatelessWidget {
             ],
           )),
           SizedBox(height: 50),
-          Text(
-            'Crear una nueva cuenta',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          TextButton(
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, 'register'),
+              style: ButtonStyle(
+                  overlayColor:
+                      MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
+                  shape: MaterialStateProperty.all(StadiumBorder())),
+              child: Text(
+                'Crear una nueva cuenta',
+                style: TextStyle(fontSize: 18, color: Colors.black87),
+              )),
           SizedBox(height: 50),
         ],
       ),
@@ -82,16 +90,6 @@ class _LoginForm extends StatelessWidget {
               },
             ),
             SizedBox(height: 30),
-            TextButton(
-                onPressed: () =>
-                    Navigator.pushReplacementNamed(context, 'register'),
-                style: ButtonStyle(
-                    overlayColor: MaterialStateProperty.all(
-                        Colors.indigo.withOpacity(0.1)),
-                    shape: MaterialStateProperty.all(StadiumBorder())),
-                child: Text('Crear una nueva cuenta',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
             MaterialButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -108,17 +106,25 @@ class _LoginForm extends StatelessWidget {
                     ? null
                     : () async {
                         FocusScope.of(context).unfocus();
+                        final authService =
+                            Provider.of<AuthService>(context, listen: false);
 
                         if (!loginForm.isValidForm()) return;
 
                         loginForm.isLoading = true;
 
-                        await Future.delayed(Duration(seconds: 2));
-
                         // TODO: validar si el login es correcto
-                        loginForm.isLoading = false;
+                        final String? errorMessage = await authService.login(
+                            loginForm.email, loginForm.password);
 
-                        Navigator.pushReplacementNamed(context, 'home');
+                        if (errorMessage == null) {
+                          Navigator.pushReplacementNamed(context, 'home');
+                        } else {
+                          // TODO: mostrar error en pantalla
+                          // print( errorMessage );
+                          NotificationsService.showSnackbar(errorMessage);
+                          loginForm.isLoading = false;
+                        }
                       })
           ],
         ),

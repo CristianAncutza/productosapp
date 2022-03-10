@@ -7,9 +7,12 @@ class InputDecorations {
       IconData? prefixIcon}) {
     return InputDecoration(
         enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.deepPurple),
+        ),
+        focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.deepPurple, width: 2)),
-        hintText: 'cristian@hotmail.com',
-        labelText: 'Correo electrónico',
+        hintText: hintText,
+        labelText: labelText,
         labelStyle: TextStyle(color: Colors.grey),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, color: Colors.deepPurple)
